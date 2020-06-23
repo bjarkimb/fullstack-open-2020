@@ -1,0 +1,10 @@
+note over browser:
+browser executes the event handler
+event handler creates new note,
+adds new note to notes list,
+rerenders the notes list on the page,
+sends note to server
+end note
+
+browser->server: HTTP POST (https://fullstack-exampleapp.herokuapp.com/new_note_spa)
+server->browser: HTTP 201 (Created)

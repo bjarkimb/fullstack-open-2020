@@ -16,7 +16,7 @@ const MaxVotes = ({votes, anecdotes})  =>  {
 
 
 
-const App = (props) => {
+const App = ({anecdotes}) => {
   const [selected, setSelected] = useState(0)
 
   const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0))
@@ -35,7 +35,7 @@ const App = (props) => {
   return (
     <div>
       <h1>Anecdote of the day</h1>
-      {props.anecdotes[selected]}
+      {anecdotes[selected]}
       <p>has {votes[selected]} {(votes[selected] === 1) ? 'vote' : 'votes'} </p>
       <br/>
       <Button handleClick={voteAnecdote} text='vote' />

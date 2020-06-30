@@ -20,11 +20,16 @@ const App = () => {
     setFilterText(event.target.value)
   }
 
+  const handleClick = (name) => {
+    console.log('setting search text to', name)
+    setFilterText(name)
+  }
+
   return (
     <div>
       <FilterForm handleFilter={handleFilter} />
 
-      <ListCountries filterText={filterText} countries={countries} />
+      <ListCountries filterText={filterText} countries={countries} handleClick={handleClick} />
     </div>
   )
 }

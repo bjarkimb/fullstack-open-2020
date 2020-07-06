@@ -7,11 +7,11 @@ const filterItems = (arr, query) => {
 }
 
 
-const Filter = ({ persons, filterText }) => {
+const Filter = ({ persons, filterText, removePerson }) => {
   if (filterText === ''){
     return(
       persons.map((person) =>
-        <Display key={person.name} person={person} />
+        <Display key={person.name} person={person} removePerson={removePerson} />
       )
     )
   }
@@ -19,7 +19,7 @@ const Filter = ({ persons, filterText }) => {
     const filtList = filterItems(persons,filterText)
     return (
       filtList.map((person) =>
-        <Display key={person.name} person={person} />
+        <Display key={person.name} person={person} removePerson={removePerson} />
       )
 
     )

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import FilterForm from './components/FilterForm'
+import Notification from './components/Notification'
 import personService from './services/persons'
 
 
@@ -10,6 +11,8 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filterText, setFilterText ] = useState('')
+  const [ errorMessage, setErrorMessage ] = useState(null)
+  const [ errorColor, setErrorColor ] = useState('green')
 
   useEffect(() => {
     personService
@@ -34,7 +37,7 @@ const App = () => {
 
   const AddPerson = (event) => {
     event.preventDefault()
-    
+
     if (persons.map((str) => str.name).includes(newName)){
       const changeNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
       if (changeNumber) {
@@ -50,6 +53,11 @@ const App = () => {
             setPersons(persons.map(person => (
               person.id === personUpdate.id ? personUpdate : person
             )))
+            setErrorColor('green')
+            setErrorMessage(`Updated the number of ${newName}`)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
         setNewName('')
         setNewNumber('')
@@ -70,6 +78,11 @@ const App = () => {
         .create(personObject)
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
+          setErrorColor('green')
+          setErrorMessage(`Added ${newName}`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
           setNewName('')
           setNewNumber('')
         })
@@ -83,6 +96,21 @@ const App = () => {
       personService
         .remove(id)
         .then(() => {
+          setErrorColor('green')
+          setPersons(persons.filter(person => person.id !== id))
+          setErrorMessage(`Removed ${name}`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorColor('red')
+          setErrorMessage(
+            `Information of ${name} has already been removed from the server`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
           setPersons(persons.filter(person => person.id !== id))
         })
     }
@@ -92,6 +120,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={errorMessage} errorColor={errorColor} />
 
       <FilterForm handleFilter={handleFilter} />
 

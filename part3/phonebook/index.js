@@ -9,23 +9,22 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('build'))
 
-morgan.token('request', function (req, res) {return JSON.stringify(req.body)})
+morgan.token('request', function (req) {return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request'))
 
 
 
-app.get('/api/persons', (request, response, next) => {
+app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons.map(person => person.toJSON()))
   })
-  .catch(error => next(error))
 })
 
 
-app.get('/info', (request, response, next) => {
-	const time = new Date()
-  Person.countDocuments({}, (error, count) => {
-    response.json( {info: `Phonebook has info for ${count} people`, time: `${time}`})
+app.get('/info', (request, response) => {
+  const time = new Date()
+  Person.countDocuments({ }, (error, count) => {
+    response.json( { info: `Phonebook has info for ${ count } people`, time: `${ time }` })
   })
 })
 
@@ -56,25 +55,18 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
-  if (!body.name) {
-    return response.status(400).json({ 
-      error: 'name missing' 
-    })
-  }
-  if (!body.number) {
-    return response.status(400).json({ 
-      error: 'number missing' 
-    })
-  }
 
   const person = new Person({
     name: body.name,
     number: body.number,
   })
 
-  person.save().then(savedPerson => {
-    response.json(savedPerson.toJSON())
-  })
+  person.save()
+    .then(savedPerson => savedPerson.toJSON())
+    .then(savedAndFormattedPerson => {
+      response.json(savedAndFormattedPerson)
+    })
+    .catch(error => next(error))
 })
 
 
@@ -86,9 +78,10 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number,
   }
 
-  Person.findByIdAndUpdate(request.params.id, person, {new: true })
-    .then(updatedPerson => {
-      response.json(updatedPerson.toJSON())
+  Person.findByIdAndUpdate({ _id: request.params.id }, person, { new: true, runValidators: true })
+    .then(updatedPerson => updatedPerson.toJSON())
+    .then(updatedAndFormattedPerson => {
+      response.json(updatedAndFormattedPerson)
     })
     .catch(error => next(error))
 })
@@ -105,7 +98,10 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  }
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
   next(error)
 }

@@ -59,6 +59,13 @@ const App = () => {
               setErrorMessage(null)
             }, 5000)
           })
+          .catch(error => {
+            setErrorColor('red')
+            setErrorMessage(error.response.data.error)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          })
         setNewName('')
         setNewNumber('')
       }
@@ -86,7 +93,16 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
-      
+        .catch(error => {
+          setErrorColor('red')
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+          setNewName('')
+          setNewNumber('')
+        })
+        
     }
   }
 
